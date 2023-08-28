@@ -1,0 +1,26 @@
+---
+version: "3.5"
+services:
+  tailscale:
+    build:
+      context: ./tailscale
+      dockerfile: Dockerfile
+      args:
+        - IMAGE_TAG=tailscale-alpine
+    container_name: tailscale
+    hostname: container123
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    cap_add:
+      - NET_ADMIN
+    volumes:
+      - ${PWD}/tailscale/config:/var/lib/tailscale
+      - ${PWD}/tailscale/state:/state
+      - /dev/net/tun:/dev/net/tun
+    sysctls:
+      - net.ipv4.ip_forward=1
+      - net.ipv4.conf.all.src_valid_mark=1
+      - net.ipv6.conf.all.forwarding=1
+    restart: unless-stopped
